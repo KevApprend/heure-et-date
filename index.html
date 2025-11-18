@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>French Time & Date Flashcards</title>
+<style>
+  :root{
+    --card-w: 380px;
+    --card-h: 220px;
+    --accent: #2b9cff;
+    --muted: #6b7280;
+  }
+  html,body{height:100%;margin:0;font-family:Inter,"Poppins",system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial;}
+  body{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:linear-gradient(120deg,#f0f3ff,#fffaf0);
+    padding:24px;
+  }
+
+  .app{text-align:center;width:min(100%,900px)}
+  header{display:flex;gap:12px;align-items:center;justify-content:center;margin-bottom:20px}
+  .flag{width:72px;height:48px;border-radius:6px;border:1px solid #ddd;overflow:hidden;display:flex}
+  .flag div{flex:1}
+  .blue{background:#0055A4}.white{background:#fff}.red{background:#EF4135}
+  h1{font-size:1.4rem;margin:0;color:#222;font-weight:600}
+  p.lead{margin:8px 0 18px;color:var(--muted)}
+
+  #card{
+    width:var(--card-w);height:var(--card-h);
+    border-radius:18px;
+    box-shadow:0 8px 30px rgba(20,30,60,.08);
+    background:linear-gradient(180deg,#ffffff,#fbfdff);
+    display:flex;align-items:center;justify-content:center;
+    cursor:pointer;user-select:none;padding:18px;margin-inline:auto;
+    transition:transform .15s ease, box-shadow .15s ease;
+  }
+  #card:active{transform:translateY(2px)}
+  .english{font-size:1.9rem;font-weight:700;color:#111}
+  .french{font-size:1.9rem;font-weight:700;color:#0b4a6f}
+
+  .controls{display:flex;gap:10px;justify-content:center;margin-top:18px;flex-wrap:wrap}
+  button{padding:10px 14px;border-radius:10px;border:0;cursor:pointer;font-weight:600}
+  .btn-next{background:#f3f4f6;color:#111}
+  .btn-random{background:var(--accent);color:#fff}
+
+  footer{margin-top:14px;color:var(--muted);font-size:0.9rem}
+</style>
+</head>
+<body>
+<main class="app">
+  <header>
+    <div class="flag"><div class="blue"></div><div class="white"></div><div class="red"></div></div>
+    <h1>French Time & Date Flashcards</h1>
+  </header>
+
+  <section>
+    <div id="card"></div>
+
+    <div class="controls">
+      <button id="nextBtn" class="btn-next">➡️ Next</button>
+      <button id="randomBtn" class="btn-random">🔀 Shuffle</button>
+    </div>
+
+    <footer>🇫🇷 Flashcard Trainer 🇫🇷</footer>
+  </section>
+</main>
+
+<script>
+// TIME + DATE TERMS
+const items = [
+  // Times (expanded)
+  { english: "9:15", french: "neuf heures et quart" },
+  { english: "2:45 pm", french: "quatorze heures quarante-cinq" },
+  { english: "7:30", french: "sept heures et demie" },
+  { english: "12:00", french: "midi" },
+  { english: "00:00", french: "minuit" },
+  { english: "5:50", french: "six heures moins dix" },
+  { english: "8:05", french: "huit heures cinq" },
+  { english: "11:40", french: "midi moins vingt" },
+  { english: "3:15", french: "trois heures et quart" },
+  { english: "4:45", french: "cinq heures moins le quart" },
+  { english: "6:20", french: "six heures vingt" },
+  { english: "9:50", french: "dix heures moins dix" },
+  { english: "1:30 pm", french: "treize heures trente" },
+  { english: "10:25", french: "dix heures vingt-cinq" },
+  { english: "2:10", french: "deux heures dix" },
+  { english: "6:55", french: "sept heures moins cinq" },
+
+  // Date & time vocabulary (expanded)
+  { english: "yesterday", french: "hier" },
+  { english: "tomorrow", french: "demain" },
+  { english: "evening", french: "soir" },
+  { english: "morning", french: "matin" },
+  { english: "afternoon", french: "après-midi" },
+  { english: "this afternoon", french: "cet après-midi" },
+  { english: "tonight", french: "ce soir" },
+  { english: "this morning", french: "ce matin" },
+  { english: "after", french: "après" },
+  { english: "before", french: "avant" },
+  { english: "last week", french: "la semaine dernière" },
+  { english: "next week", french: "la semaine prochaine" },
+  { english: "weekend", french: "le week-end" },
+  { english: "last month", french: "le mois dernier" },
+  { english: "next month", french: "le mois prochain" },
+  { english: "last year", french: "l'année dernière" },
+  { english: "next year", french: "l'année prochaine" },
+  { english: "the day before yesterday", french: "avant-hier" },
+  { english: "the day after tomorrow", french: "après-demain" },
+  { english: "early morning", french: "tôt le matin" },
+  { english: "late evening", french: "tard le soir" },
+  { english: "every morning", french: "chaque matin" },
+  { english: "every evening", french: "chaque soir" },
+  { english: "during the afternoon", french: "dans l’après-midi" }
+];
+
+let index = 0;
+let showingFrench = false;
+
+const card = document.getElementById("card");
+const nextBtn = document.getElementById("nextBtn");
+const randomBtn = document.getElementById("randomBtn");
+
+function renderFront(item){
+  card.innerHTML = `<div class="english">${item.english}</div>`;
+}
+function renderBack(item){
+  card.innerHTML = `<div class="french">${item.french}</div>`;
+}
+
+function showIndex(i){
+  index = (i + items.length) % items.length;
+  showingFrench = false;
+  renderFront(items[index]);
+}
+
+function flip(){
+  showingFrench = !showingFrench;
+  showingFrench ? renderBack(items[index]) : renderFront(items[index]);
+}
+
+function shuffle(){
+  for(let i=items.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [items[i], items[j]] = [items[j], items[i]];
+  }
+  showIndex(0);
+}
+
+card.addEventListener('click', flip);
+nextBtn.addEventListener('click', () => showIndex(index+1));
+randomBtn.addEventListener('click', shuffle);
+
+showIndex(0);
+</script>
+</body>
+</html>
